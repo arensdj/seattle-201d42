@@ -1,0 +1,10 @@
+img {
+  height: 300px;
+}
+
+section, canvas {
+  padding: 30px;
+  border: 2px solid red;
+  height: 300px;
+  width: 600px;
+}
