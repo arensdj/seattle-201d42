@@ -3,7 +3,7 @@
 Goat.sectionEl = document.getElementById('goat-section');
 Goat.leftImgEl = document.getElementById('left-image');
 Goat.rightImgEl = document.getElementById('right-image');
-Goat.chartContext = document.getElementById('results-chart');
+Goat.chartContext = document.getElementById('results-chart').getContext('2d');
 
 Goat.barButton = document.getElementById('bar');
 Goat.doughnutButton = document.getElementById('doughnut');
@@ -13,7 +13,7 @@ Goat.allGoats = [];
 
 Goat.displayed = [];
 
-Goat.allAltText = [];
+Goat.names = [];
 
 Goat.totalVotes = [];
 
@@ -26,7 +26,6 @@ function Goat(filepath, altText){
   this.altText = altText;
   this.timesClicked = 0;
   this.timesDisplayed = 0;
-  Goat.allAltText.push(this.altText);
 }
 
 Goat.allGoats = Goat.parsedGoats || [
@@ -92,12 +91,12 @@ Goat.handleClick = function(event) {
 
   if(Goat.totalClicks > 9) {
     Goat.sectionEl.removeEventListener('click', Goat.handleClick);
-    Goat.updateVotes();
-
+    
     // var stringifiedGoats = JSON.stringify(Goat.allGoats);
     // localStorage.setItem('userResults', stringifiedGoats);
-
+    
     localStorage.setItem('userResults', JSON.stringify(Goat.allGoats));
+    Goat.updateVotes();
   } else {
     Goat.renderImages();
   }
@@ -106,6 +105,7 @@ Goat.handleClick = function(event) {
 Goat.updateVotes = function() {
   for(var i = 0; i < Goat.allGoats.length; i++) {
     Goat.totalVotes[i] = Goat.allGoats[i].timesClicked;
+    Goat.names[i] = Goat.allGoats[i].altText;
   }
 };
 
@@ -114,15 +114,15 @@ Goat.renderImages();
 Goat.results;
 
 Goat.displayChart = function(event) {
-  console.log(event.target);
   var chartType = event.target.id;
-
+  console.log('votes', Goat.totalVotes);
+  console.log({chartType});
   if(Goat.results) Goat.results.destroy();
 
   Goat.results = new Chart(Goat.chartContext, {
     type: chartType,
     data: {
-      labels: Goat.allAltText,
+      labels: Goat.names,
       datasets: [{
         label: 'Votes Per Goat',
         data: Goat.totalVotes,
@@ -130,6 +130,7 @@ Goat.displayChart = function(event) {
       }],
     },
     options: {
+      responsive: false,
       scales: {
         yAxes: [{
           ticks: {
